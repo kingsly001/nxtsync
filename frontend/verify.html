@@ -230,7 +230,9 @@ async function verifyAndLoad() {
 
             // 3. Load the PDF (Using single CERT- prefix)
             // If certId is "CERT-123", this looks for "/certificates/CERT-123.pdf"
-            const pdfUrl = `/certificates/${certId}.pdf#toolbar=0&navpanes=0&scrollbar=0&view=FitH`;
+            // Inside verify.html - change ONLY this line
+            const pdfUrl = `${window.location.origin}/certificates/${certId}.pdf#toolbar=0&navpanes=0&scrollbar=0&view=FitH`;
+           // const pdfUrl = `/certificates/${certId}.pdf#toolbar=0&navpanes=0&scrollbar=0&view=FitH`;
             
             pdfFrame.src = pdfUrl;
 

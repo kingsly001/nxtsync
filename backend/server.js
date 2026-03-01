@@ -31,8 +31,8 @@ app.use('/api/admin', require('./routes/adminRoutes'));
 app.use('/api/certificate', require('./routes/certificateRoutes'));
 
 // Serve static files for certificates
-app.use('/certificates', express.static(path.join(__dirname, 'public/certificates')));
-
+// server.js
+app.use('/certificates', express.static(path.join(__dirname, 'public', 'certificates')));
 // Serve Frontend
 app.use(express.static(path.join(__dirname, '../frontend')));
 
