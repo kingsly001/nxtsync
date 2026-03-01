@@ -44,7 +44,10 @@ app.use(express.static(frontendPath));
 
 // 6. Handle SPA Routing (Optional)
 // Ensures that if a user refreshes a sub-page, it serves index.html
-app.get('/:any*', (req, res) => {
+app.get('*', (req, res) => {
+    res.sendFile(path.join(frontendPath, 'index.html'));
+}, (error, req, res, next) => {
+    // This error handler prevents the PathError from crashing the app
     res.sendFile(path.join(frontendPath, 'index.html'));
 });
 
