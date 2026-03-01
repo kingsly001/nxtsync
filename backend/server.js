@@ -39,17 +39,25 @@ app.use('/certificates', express.static(certPath));
  * Serving the Frontend
  * Since server.js is in /backend, we go one level up to reach /frontend.
  */
+// backend/server.js
+
+// 🟢 STEP 1: Serving the Frontend (Already in your code)
 const frontendPath = path.join(__dirname, '../frontend');
 app.use(express.static(frontendPath));
 
-// 6. Handle SPA Routing (Optional)
-// Ensures that if a user refreshes a sub-page, it serves index.html
-app.get('/:path*', (req, res) => {
+// 🟢 STEP 2: The Ultimate Catch-All (Replaces line 47)
+// This uses a regular function instead of a regex string to avoid PathError
+app.use((req, res, next) => {
+    // If the request is for an API or Certificate, let it pass through
+    if (req.url.startsWith('/api') || req.url.startsWith('/certificates')) {
+        return next();
+    }
+    // For all other routes (like /login, /verify), serve index.html
     res.sendFile(path.join(frontendPath, 'index.html'));
 });
 
+// Final listen block (Already in your code)
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);
-    console.log(`📁 Certificates being served from: ${certPath}`);
 });
