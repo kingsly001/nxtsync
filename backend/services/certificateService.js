@@ -14,7 +14,8 @@ const generateCertificate = (data) => {
 
             // Filename management
             const fileName = `${data.certificateId}.pdf`;
-            const folderPath = path.join(__dirname, '../public/certificates');
+// In certificateService.js
+            const folderPath = path.join(process.cwd(), 'public', 'certificates');
             if (!fs.existsSync(folderPath)) fs.mkdirSync(folderPath, { recursive: true });
 
             const filePath = path.join(folderPath, fileName);

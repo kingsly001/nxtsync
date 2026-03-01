@@ -32,9 +32,24 @@ app.use('/api/certificate', require('./routes/certificateRoutes'));
 
 // Serve static files for certificates
 // server.js
-app.use('/certificates', express.static(path.join(__dirname, 'public', 'certificates')));
-// Serve Frontend
-app.use(express.static(path.join(__dirname, '../frontend')));
+const certPath = path.join(__dirname, 'public', 'certificates');
+app.use('/certificates', express.static(certPath));
+
+/**
+ * Serving the Frontend
+ * Since server.js is in /backend, we go one level up to reach /frontend.
+ */
+const frontendPath = path.join(__dirname, '../frontend');
+app.use(express.static(frontendPath));
+
+// 6. Handle SPA Routing (Optional)
+// Ensures that if a user refreshes a sub-page, it serves index.html
+app.get('*', (req, res) => {
+    res.sendFile(path.join(frontendPath, 'index.html'));
+});
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT}`);
+    console.log(`📁 Certificates being served from: ${certPath}`);
+});

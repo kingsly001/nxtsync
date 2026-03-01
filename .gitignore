@@ -5,3 +5,6 @@ node_modules/
 dist/
 build/
 coverage/
+# Ignore generated PDFs but keep the folder
+backend/public/certificates/*.pdf
+!backend/public/certificates/.gitkeep
