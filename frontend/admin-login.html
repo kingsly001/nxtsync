@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; connect-src 'self' http://localhost:5000; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com;">
+    <title>Admin Login - Course Certificate Generator</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+
+    <div class="auth-container-wrapper">
+        <header>
+            <div class="container">
+                <nav>
+                    <a href="index.html" class="logo"><img src="assets/logo.jpg" alt="Academy Logo"></a>
+                    <div class="nav-links">
+                        <a href="index.html">Home</a>
+                    </div>
+                </nav>
+            </div>
+        </header>
+
+        <main class="container">
+            <div class="form-container glass-effect">
+                <h2 class="text-center mb-4">Admin Login</h2>
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" required>
+                    </div>
+                    <button type="submit" class="btn" style="width: 100%;">Login</button>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        const loginForm = document.getElementById('loginForm');
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const data = await apiFetch('/auth/admin/login', {
+                    method: 'POST',
+                    body: JSON.stringify({ email, password }),
+                });
+
+                setAuth(data);
+                window.location.href = 'pages/admin/dashboard.html';
+            } catch (error) {
+                alert(error.message);
+            }
+        });
+    </script>
+</body>
+
+</html>
