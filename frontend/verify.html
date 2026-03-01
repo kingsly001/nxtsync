@@ -229,12 +229,18 @@ async function verifyAndLoad() {
             `;
 
             // 3. Load the PDF (Using single CERT- prefix)
-            // If certId is "CERT-123", this looks for "/certificates/CERT-123.pdf"
-            // Inside verify.html - change ONLY this line
-            const pdfUrl = `${window.location.origin}/certificates/${certId}.pdf#toolbar=0&navpanes=0&scrollbar=0&view=FitH`;
-           // const pdfUrl = `/certificates/${certId}.pdf#toolbar=0&navpanes=0&scrollbar=0&view=FitH`;
-            
-            pdfFrame.src = pdfUrl;
+           const pdfUrl = `${window.location.origin}/certificates/${certId}.pdf`;
+
+            // 2. DETECT MOBILE: Check if the user is on a phone/tablet
+            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+            if (isMobile) {
+                // Use Google Viewer for mobile to force it to show inline
+                pdfFrame.src = `https://docs.google.com/viewer?url=${encodeURIComponent(pdfUrl)}&embedded=true`;
+            } else {
+                // Use your native method for Laptops (Desktop)
+                pdfFrame.src = `${pdfUrl}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`;
+            }
 
         } else {
             detailsBox.innerHTML = `<p style="color:red;"><b>Verification Failed:</b> ${data.message}</p>`;
