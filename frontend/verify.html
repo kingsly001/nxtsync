@@ -200,15 +200,17 @@ if (response.ok) {
         <p><b>ISSUE DATE:</b> ${new Date(data.issueDate).toLocaleDateString('en-GB')}</p>
     `;
 
-    const pdfUrl = data.certificateUrl; 
-    const pdfFrame = document.getElementById('cert-frame');
+    let pdfUrl = data.certificateUrl; 
+    const secureUrl = pdfUrl.replace('/upload/', '/upload/fl_inline,fl_attachment:false/');
+
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    const pdfFrame = document.getElementById('cert-frame');
 
     if (isMobile) {
-        pdfFrame.src = `https://docs.google.com/viewer?url=${encodeURIComponent(pdfUrl)}&embedded=true`;
+        pdfFrame.src = `https://docs.google.com/viewer?url=${encodeURIComponent(secureUrl)}&embedded=true`;
     } else {
-        // Laptop View
-        pdfFrame.src = `${pdfUrl}#toolbar=0&navpanes=0&scrollbar=0`;
+        // Desktop View with UI flags
+        pdfFrame.src = `${secureUrl}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`;
     }
 }else {
                 detailsBox.innerHTML = `<p style="color:red;"><b>Verification Failed:</b> ${data.message}</p>`;

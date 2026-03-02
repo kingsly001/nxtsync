@@ -64,19 +64,18 @@ const generateCertificate = (data) => {
 
             doc.end();
             
-// Inside writeStream.on('finish', ...) in certificateService.js
             writeStream.on('finish', async () => {
                 try {
-                    // Inside writeStream.on('finish', ...)
-const result = await cloudinary.uploader.upload(filePath, {
-    folder: 'certificates',
-    public_id: data.certificateId,
-    resource_type: 'image', // 🟢 MUST be 'image' for Cloudinary to treat PDF as viewable
-    format: 'pdf',          // 🟢 Keeps it a PDF
-    type: 'upload',
-    flags: "attachment:false", 
-    content_disposition: "inline" 
-});
+                    const result = await cloudinary.uploader.upload(filePath, {
+                        folder: 'certificates',
+                        public_id: data.certificateId,
+                        // 🟢 FIX 1: Explicitly set resource_type and flags
+                        resource_type: 'image', 
+                        format: 'pdf',
+                        flags: "attachment:false", 
+                        content_disposition: "inline",
+                        type: "upload" 
+                    });
 
                     if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
                     resolve(result.secure_url); 
