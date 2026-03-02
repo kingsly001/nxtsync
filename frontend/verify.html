@@ -200,21 +200,15 @@ if (response.ok) {
         <p><b>ISSUE DATE:</b> ${new Date(data.issueDate).toLocaleDateString('en-GB')}</p>
     `;
 
-    // 🟢 THE FIX: Transform the Cloudinary URL to force INLINE delivery
-    // This inserts 'fl_inline' into the URL path
-    let pdfUrl = data.certificateUrl;
-    const inlineUrl = pdfUrl.replace('/upload/', '/upload/fl_inline,fl_attachment:false/');
-
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    const pdfUrl = data.certificateUrl; 
     const pdfFrame = document.getElementById('cert-frame');
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
     if (isMobile) {
-        // Mobile browsers are very aggressive with downloads
-        // Using the Google Docs Viewer is the ONLY way to guarantee no auto-download
-        pdfFrame.src = `https://docs.google.com/viewer?url=${encodeURIComponent(inlineUrl)}&embedded=true`;
+        pdfFrame.src = `https://docs.google.com/viewer?url=${encodeURIComponent(pdfUrl)}&embedded=true`;
     } else {
-        // Laptop/Desktop Fix
-        pdfFrame.src = `${inlineUrl}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`;
+        // Laptop View
+        pdfFrame.src = `${pdfUrl}#toolbar=0&navpanes=0&scrollbar=0`;
     }
 }else {
                 detailsBox.innerHTML = `<p style="color:red;"><b>Verification Failed:</b> ${data.message}</p>`;
