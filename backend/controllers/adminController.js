@@ -89,11 +89,12 @@ const approveCertificate = async (req, res) => {
         });
 
         // 2. Save the Cloudinary URL to MongoDB
+// Inside approveCertificate in adminController.js
         await Certificate.create({
             certificateId,
             studentId: request.studentId._id,
             courseId: request.courseId._id,
-            certificateUrl: String(cloudinaryUrl), // 🟢 Ensure string format
+            certificateUrl: String(cloudinaryUrl).replace('http://', 'https://'), // 🟢 Force HTTPS
             verificationCode,
         });
 

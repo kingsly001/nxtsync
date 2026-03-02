@@ -200,17 +200,20 @@ if (response.ok) {
         <p><b>ISSUE DATE:</b> ${new Date(data.issueDate).toLocaleDateString('en-GB')}</p>
     `;
 
-    let pdfUrl = data.certificateUrl; 
-    const secureUrl = pdfUrl.replace('/upload/', '/upload/fl_inline,fl_attachment:false/');
+    let pdfUrl = data.certificateUrl.trim();
+    
+    // Force the 'fl_inline' transformation only if it's a valid Cloudinary link
+    const secureUrl = pdfUrl.includes('cloudinary') 
+        ? pdfUrl.replace('/upload/', '/upload/fl_inline,fl_attachment:false/')
+        : pdfUrl;
 
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
     const pdfFrame = document.getElementById('cert-frame');
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
     if (isMobile) {
         pdfFrame.src = `https://docs.google.com/viewer?url=${encodeURIComponent(secureUrl)}&embedded=true`;
     } else {
-        // Desktop View with UI flags
-        pdfFrame.src = `${secureUrl}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`;
+        pdfFrame.src = `${secureUrl}#view=FitH`;
     }
 }else {
                 detailsBox.innerHTML = `<p style="color:red;"><b>Verification Failed:</b> ${data.message}</p>`;
