@@ -206,6 +206,8 @@
     const params = new URLSearchParams(window.location.search);
     const certId = params.get('id');
 
+// --- ONLY REPLACING THE SCRIPT SECTION OF YOUR VERIFY.HTML ---
+
 async function verifyAndLoad() {
     const detailsBox = document.getElementById('details-content');
     const pdfFrame = document.getElementById('cert-frame');
@@ -216,29 +218,25 @@ async function verifyAndLoad() {
     }
 
     try {
-        // 1. Fetch text details
         const response = await fetch(`/api/certificate/verify/${certId}`);
         const data = await response.json();
 
         if (response.ok) {
-            // 2. Update the Details UI
             detailsBox.innerHTML = `
                 <p><b>NAME:</b> ${data.student.toUpperCase()}</p>
                 <p><b>DOMAIN:</b> ${data.course.toUpperCase()}</p>
                 <p><b>ISSUED DATE:</b> ${new Date(data.issueDate).toLocaleDateString('en-GB')}</p>
             `;
 
-            // 3. Load the PDF (Using single CERT- prefix)
-           const pdfUrl = `${window.location.origin}/certificates/${certId}.pdf`;
+            // 🟢 THE FIX: Use the URL from the database (Cloudinary)
+            // Fallback to local only if the cloud URL isn't present
+            const pdfUrl = data.certificateUrl || `${window.location.origin}/certificates/${certId}.pdf`;
 
-            // 2. DETECT MOBILE: Check if the user is on a phone/tablet
             const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
             if (isMobile) {
-                // Use Google Viewer for mobile to force it to show inline
                 pdfFrame.src = `https://docs.google.com/viewer?url=${encodeURIComponent(pdfUrl)}&embedded=true`;
             } else {
-                // Use your native method for Laptops (Desktop)
                 pdfFrame.src = `${pdfUrl}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`;
             }
 
@@ -246,11 +244,10 @@ async function verifyAndLoad() {
             detailsBox.innerHTML = `<p style="color:red;"><b>Verification Failed:</b> ${data.message}</p>`;
         }
     } catch (err) {
-        console.error("Connection error:", err);
         detailsBox.innerHTML = "<p>Service Unavailable. Check server status.</p>";
     }
 }
-    verifyAndLoad();
+verifyAndLoad();
 </script>
 
 </body>
