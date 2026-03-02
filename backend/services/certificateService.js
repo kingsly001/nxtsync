@@ -60,22 +60,24 @@ const generateCertificate = (data) => {
             const verifyUrl = `${process.env.FRONTEND_URL}/verify.html?id=${data.certificateId}`;
             const qrDataUrl = await QRCode.toDataURL(verifyUrl, { margin: 1 });
             doc.image(qrDataUrl, (841.89 / 2) - 42.5, 490, { width: 85 });
+// ... (previous imports and design code remain identical)
 
             doc.end();
             
-            // 🟢 FIXED FINISH HANDLER
             writeStream.on('finish', async () => {
                 try {
+                    // 🟢 FIX: resource_type 'auto' and 'inline' flags prevent auto-download
                     const result = await cloudinary.uploader.upload(filePath, {
-                    folder: 'certificates',
-                    public_id: data.certificateId,
-                    resource_type: 'auto', // ⬅️ Change 'raw' to 'auto' or 'image'
-                    flags: "attachment:false" // ⬅️ Ensures it displays instead of downloading
-                });
+                        folder: 'certificates',
+                        public_id: data.certificateId,
+                        resource_type: 'auto', 
+                        flags: "attachment:false",
+                        content_disposition: "inline" 
+                    });
 
                     if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
                     
-                    // This is where your error was: ensured proper closure of brackets
+                    // Resolve with the secure HTTPS URL
                     resolve(result.secure_url); 
                 } catch (uploadErr) {
                     reject(uploadErr);

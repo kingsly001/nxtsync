@@ -62,7 +62,8 @@ const getCertificateRequests = async (req, res) => {
     }
 };
 
-// @desc    Approve certificate request & Email PDF Link
+// ... (imports remain the same)
+
 const approveCertificate = async (req, res) => {
     const { requestId } = req.body;
     try {
@@ -77,8 +78,7 @@ const approveCertificate = async (req, res) => {
         const certificateId = `CERT-${Date.now()}`;
         const verificationCode = Math.random().toString(36).substring(7).toUpperCase();
 
-        // 🟢 1. Generate and Upload to Cloudinary
-        // This now returns the SECURE HTTPS URL from Cloudinary
+        // 1. Generate and Upload to Cloudinary
         const cloudinaryUrl = await generateCertificate({
             studentName: request.studentId.name,
             courseName: request.courseId.courseName,
@@ -88,12 +88,12 @@ const approveCertificate = async (req, res) => {
             verificationCode,
         });
 
-        // 🟢 2. Save the Cloudinary URL to MongoDB
+        // 2. Save the Cloudinary URL to MongoDB
         await Certificate.create({
             certificateId,
             studentId: request.studentId._id,
             courseId: request.courseId._id,
-            certificateUrl: cloudinaryUrl, // Permanent link saved here
+            certificateUrl: String(cloudinaryUrl), // 🟢 Ensure string format
             verificationCode,
         });
 
@@ -101,26 +101,24 @@ const approveCertificate = async (req, res) => {
         request.approvedBy = req.user._id;
         await request.save();
 
-        // Mark Enrollment as Completed
         await Enrollment.findOneAndUpdate(
             { studentId: request.studentId._id, courseId: request.courseId._id },
             { completed: true, endDate: new Date() }
         );
 
-        // 🟢 3. SEND EMAIL WITH LINK
-        // Since the file is in the cloud, we send the link instead of a local attachment
+        // 3. Email Notification
         let message = 'Certificate approved and link emailed';
         try {
             await sendEmail({
                 email: request.studentId.email,
                 subject: 'Your Course Certificate - NXTSYNC',
-                message: `Congratulations ${request.studentId.name}! Your certificate for ${request.courseId.courseName} is ready.\n\nYou can view and download it here: ${cloudinaryUrl}`,
-                // If your sendEmail util supports URL attachments, you can pass cloudinaryUrl
+                message: `Congratulations ${request.studentId.name}! Your certificate is ready.\n\nView here: ${cloudinaryUrl}`,
+                // 🟢 Sending as a link rather than a local file prevents 'false.pdf' attachment issues
                 attachments: [{ filename: `Certificate-${certificateId}.pdf`, path: cloudinaryUrl }]
             });
         } catch (emailError) {
             console.error("Email failed:", emailError.message);
-            message = 'Certificate approved and saved to cloud, but email notification failed.';
+            message = 'Approved, but email notification failed.';
         }
 
         res.json({ message, certificateUrl: cloudinaryUrl });
