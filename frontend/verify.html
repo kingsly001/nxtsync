@@ -192,30 +192,31 @@
             const response = await fetch(`/api/certificate/verify/${certId}`);
             const data = await response.json();
 
-            if (response.ok) {
-                detailsBox.innerHTML = `
-                    <p><b>STUDENT NAME:</b> ${data.student.toUpperCase()}</p>
-                    <p><b>COURSE DOMAIN:</b> ${data.course.toUpperCase()}</p>
-                    <p><b>ISSUE DATE:</b> ${new Date(data.issueDate).toLocaleDateString('en-GB')}</p>
-                `;
+            // Inside your verify.html <script>
+if (response.ok) {
+    detailsBox.innerHTML = `
+        <p><b>STUDENT NAME:</b> ${data.student.toUpperCase()}</p>
+        <p><b>COURSE DOMAIN:</b> ${data.course.toUpperCase()}</p>
+        <p><b>ISSUE DATE:</b> ${new Date(data.issueDate).toLocaleDateString('en-GB')}</p>
+    `;
 
-                // 🟢 1. Use the Cloudinary URL from the API
-                let pdfUrl = data.certificateUrl;
+    // 🟢 THE FIX: Transform the Cloudinary URL to force INLINE delivery
+    // This inserts 'fl_inline' into the URL path
+    let pdfUrl = data.certificateUrl;
+    const inlineUrl = pdfUrl.replace('/upload/', '/upload/fl_inline,fl_attachment:false/');
 
-                // 🟢 2. Transformation to force INLINE (no download)
-                // This replaces the 'upload/' part of the URL with a flag to prevent attachment
-                const securePdfUrl = pdfUrl.replace('/upload/', '/upload/fl_attachment:false/');
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    const pdfFrame = document.getElementById('cert-frame');
 
-                const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-
-                if (isMobile) {
-                    // Mobile needs Google Docs Viewer to avoid auto-download
-                    pdfFrame.src = `https://docs.google.com/viewer?url=${encodeURIComponent(securePdfUrl)}&embedded=true`;
-                } else {
-                    // Laptop uses direct URL with UI flags
-                    pdfFrame.src = `${securePdfUrl}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`;
-                }
-            } else {
+    if (isMobile) {
+        // Mobile browsers are very aggressive with downloads
+        // Using the Google Docs Viewer is the ONLY way to guarantee no auto-download
+        pdfFrame.src = `https://docs.google.com/viewer?url=${encodeURIComponent(inlineUrl)}&embedded=true`;
+    } else {
+        // Laptop/Desktop Fix
+        pdfFrame.src = `${inlineUrl}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`;
+    }
+}else {
                 detailsBox.innerHTML = `<p style="color:red;"><b>Verification Failed:</b> ${data.message}</p>`;
             }
         } catch (err) {
