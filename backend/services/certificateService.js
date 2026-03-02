@@ -70,11 +70,13 @@ const generateCertificate = (data) => {
 const result = await cloudinary.uploader.upload(filePath, {
     folder: 'certificates',
     public_id: data.certificateId,
-    resource_type: 'image', // 🟢 Required for PDF previewing
+    resource_type: 'image', // Required for browser rendering
     format: 'pdf',
-    type: 'upload',         // 🟢 Matches your successful test
-    access_mode: 'public',  // 🟢 Ensures public reachability
-    invalidate: true        // 🟢 Clears any old cached errors for this ID
+    type: 'upload',         // 🟢 This makes the link public
+    access_mode: 'public',  // 🟢 Explicitly removes 401 restrictions
+    invalidate: true,
+    // 🟢 ADD THIS: Prevents Cloudinary from applying "authenticated" logic
+    delivery_type: 'upload' 
 });
 
                     if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
