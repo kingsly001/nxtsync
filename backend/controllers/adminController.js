@@ -108,17 +108,19 @@ const approveCertificate = async (req, res) => {
 
         // 3. Email Notification
         let message = 'Certificate approved and link emailed';
+        // Inside approveCertificate in adminController.js
         try {
             await sendEmail({
                 email: request.studentId.email,
                 subject: 'Your Course Certificate - NXTSYNC',
-                message: `Congratulations ${request.studentId.name}! Your certificate is ready.\n\nView here: ${cloudinaryUrl}`,
-                // 🟢 Sending as a link rather than a local file prevents 'false.pdf' attachment issues
-                attachments: [{ filename: `Certificate-${certificateId}.pdf`, path: cloudinaryUrl }]
+                message: `Congratulations! View your certificate here: ${cloudinaryUrl}`,
+                attachments: [{ 
+                    filename: `${certificateId}.pdf`, // 🟢 Hardcode the extension here
+                    path: cloudinaryUrl 
+                }]
             });
         } catch (emailError) {
-            console.error("Email failed:", emailError.message);
-            message = 'Approved, but email notification failed.';
+            console.error("Email attachment error:", emailError.message);
         }
 
         res.json({ message, certificateUrl: cloudinaryUrl });

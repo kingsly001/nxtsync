@@ -6,7 +6,7 @@
     <title>Certificate Verification | NXTSYNC</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        /* 🔵 FASTER, DIAGONAL, LOOPING WATERMARK ANIMATION */
+        /* 🔵 ANIMATED WATERMARK */
         .watermark {
             position: fixed;
             top: 50%;
@@ -50,10 +50,7 @@
             z-index: 1;
         }
 
-        .logo-top {
-            text-align: left;
-            margin-bottom: 15px;
-        }
+        .logo-top { text-align: left; margin-bottom: 15px; }
 
         h1 {
             font-size: 34px;
@@ -64,18 +61,6 @@
             border: 3px solid #0f4c75;
             display: inline-block;
             border-radius: 12px;
-            background: rgba(15, 76, 117, 0.08);
-        }
-
-        h2 {
-            display: inline-block;
-            font-size: 24px;
-            font-weight: 700;
-            color: #0f4c75;
-            margin: 20px auto;
-            padding: 10px 25px;
-            border: 2px solid #0f4c75;
-            border-radius: 10px;
             background: rgba(15, 76, 117, 0.08);
         }
 
@@ -108,11 +93,10 @@
         .info-box p { margin: 10px 0; font-weight: 600; color: #333; }
         .info-box b { color: #0f4c75; }
 
-        /* 🟢 LOCKED PDF VIEWER CONTAINER */
         .certificate-wrapper {
             width: 100%;
             max-width: 800px;
-            height: 560px; /* Portrait/Landscape balance */
+            height: 560px;
             margin: 30px auto;
             border-radius: 14px;
             border: 4px solid #0f4c75;
@@ -121,11 +105,7 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.15);
         }
 
-        #cert-frame {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
+        #cert-frame { width: 100%; height: 100%; border: none; }
 
         .footer {
             margin-top: 40px;
@@ -140,7 +120,6 @@
             flex-direction: column;
             align-items: center;
             gap: 15px;
-            margin-bottom: 10px;
         }
 
         .footer-icons a {
@@ -154,11 +133,7 @@
 
         .footer-icons img { width: 24px; height: 24px; }
         
-        .loading-overlay {
-            color: #0f4c75;
-            font-weight: bold;
-            padding: 50px;
-        }
+        .loading-overlay { color: #0f4c75; font-weight: bold; padding: 50px; }
     </style>
 </head>
 <body>
@@ -172,19 +147,17 @@
 
     <h1>CERTIFICATE VERIFICATION</h1>
 
-    <div><h2>OFFICIALLY APPROVED BY</h2></div>
     <div class="logo-vertical">
         <img src="https://soundsory.com/wp-content/uploads/2023/09/ISO_9001_logo.png" alt="ISO Logo">
         <img src="https://vectorseek.com/wp-content/uploads/2023/09/AICTE-Logo-Vector.svg-.png" alt="AICTE Logo">
     </div>
 
-    <div><h2>VERIFIED DETAILS</h2></div>
     <div class="info-box" id="details-content">
-        <div class="loading-overlay">Initializing Security Handshake...</div>
+        <div class="loading-overlay">Verifying Credentials...</div>
     </div>
 
     <div class="certificate-wrapper">
-        <iframe id="cert-frame" src=""></iframe>
+        <iframe id="cert-frame"></iframe>
     </div>
 
     <div class="footer">
@@ -198,7 +171,7 @@
                 <strong>https://nxtsync.in/</strong>
             </a>
         </div>
-        <p style="font-size: 0.85rem; opacity: 0.8; margin-top: 15px;">© 2026 NxtSync Pvt. Ltd — Official Internship Verification Portal</p>
+        <p style="font-size: 0.85rem; opacity: 0.8; margin-top: 15px;">© 2026 NxtSync Pvt. Ltd</p>
     </div>
 </div>
 
@@ -206,50 +179,50 @@
     const params = new URLSearchParams(window.location.search);
     const certId = params.get('id');
 
-// --- ONLY REPLACING THE SCRIPT SECTION OF YOUR VERIFY.HTML ---
+    async function verifyAndLoad() {
+        const detailsBox = document.getElementById('details-content');
+        const pdfFrame = document.getElementById('cert-frame');
 
-async function verifyAndLoad() {
-    const detailsBox = document.getElementById('details-content');
-    const pdfFrame = document.getElementById('cert-frame');
-
-    if (!certId) {
-        detailsBox.innerHTML = "<p style='color:red;'>No ID Provided</p>";
-        return;
-    }
-
-    try {
-        const response = await fetch(`/api/certificate/verify/${certId}`);
-        const data = await response.json();
-
-        if (response.ok) {
-            detailsBox.innerHTML = `
-                <p><b>NAME:</b> ${data.student.toUpperCase()}</p>
-                <p><b>DOMAIN:</b> ${data.course.toUpperCase()}</p>
-                <p><b>ISSUED DATE:</b> ${new Date(data.issueDate).toLocaleDateString('en-GB')}</p>
-            `;
-
-            // 🟢 Use the Cloudinary URL directly from the database
-            const pdfUrl = data.certificateUrl; 
-
-            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-
-            if (isMobile) {
-                // Google Docs Viewer helps prevent auto-downloads on mobile
-                pdfFrame.src = `https://docs.google.com/viewer?url=${encodeURIComponent(pdfUrl)}&embedded=true`;
-            } else {
-                // For laptops, append toolbar=0 to the Cloudinary URL
-                pdfFrame.src = `${pdfUrl}#toolbar=0&navpanes=0&scrollbar=0`;
-            }
-
-        } else {
-            detailsBox.innerHTML = `<p style="color:red;"><b>Verification Failed:</b> ${data.message}</p>`;
+        if (!certId) {
+            detailsBox.innerHTML = "<p style='color:red;'>No Certificate ID Provided</p>";
+            return;
         }
-    } catch (err) {
-        detailsBox.innerHTML = "<p>Service Unavailable. Check server status.</p>";
-    }
-}
-verifyAndLoad();
-</script>
 
+        try {
+            const response = await fetch(`/api/certificate/verify/${certId}`);
+            const data = await response.json();
+
+            if (response.ok) {
+                detailsBox.innerHTML = `
+                    <p><b>STUDENT NAME:</b> ${data.student.toUpperCase()}</p>
+                    <p><b>COURSE DOMAIN:</b> ${data.course.toUpperCase()}</p>
+                    <p><b>ISSUE DATE:</b> ${new Date(data.issueDate).toLocaleDateString('en-GB')}</p>
+                `;
+
+                // 🟢 1. Use the Cloudinary URL from the API
+                let pdfUrl = data.certificateUrl;
+
+                // 🟢 2. Transformation to force INLINE (no download)
+                // This replaces the 'upload/' part of the URL with a flag to prevent attachment
+                const securePdfUrl = pdfUrl.replace('/upload/', '/upload/fl_attachment:false/');
+
+                const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+                if (isMobile) {
+                    // Mobile needs Google Docs Viewer to avoid auto-download
+                    pdfFrame.src = `https://docs.google.com/viewer?url=${encodeURIComponent(securePdfUrl)}&embedded=true`;
+                } else {
+                    // Laptop uses direct URL with UI flags
+                    pdfFrame.src = `${securePdfUrl}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`;
+                }
+            } else {
+                detailsBox.innerHTML = `<p style="color:red;"><b>Verification Failed:</b> ${data.message}</p>`;
+            }
+        } catch (err) {
+            detailsBox.innerHTML = "<p>Service Unavailable. Please try again later.</p>";
+        }
+    }
+    verifyAndLoad();
+</script>
 </body>
 </html>
