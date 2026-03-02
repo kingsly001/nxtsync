@@ -228,8 +228,7 @@ async function verifyAndLoad() {
                 <p><b>ISSUED DATE:</b> ${new Date(data.issueDate).toLocaleDateString('en-GB')}</p>
             `;
 
-            // 🟢 THE FIX: Use the URL from the database (Cloudinary)
-            // Fallback to local only if the cloud URL isn't present
+// 🟢 THE FIX: Use the URL from the database (Cloudinary)
             const pdfUrl = data.certificateUrl || `${window.location.origin}/certificates/${certId}.pdf`;
 
             const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
@@ -237,6 +236,7 @@ async function verifyAndLoad() {
             if (isMobile) {
                 pdfFrame.src = `https://docs.google.com/viewer?url=${encodeURIComponent(pdfUrl)}&embedded=true`;
             } else {
+                // Load Cloudinary URL directly in the iframe
                 pdfFrame.src = `${pdfUrl}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`;
             }
 
@@ -244,6 +244,7 @@ async function verifyAndLoad() {
             detailsBox.innerHTML = `<p style="color:red;"><b>Verification Failed:</b> ${data.message}</p>`;
         }
     } catch (err) {
+        console.error("Connection error:", err);
         detailsBox.innerHTML = "<p>Service Unavailable. Check server status.</p>";
     }
 }

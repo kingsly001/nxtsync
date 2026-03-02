@@ -67,10 +67,11 @@ const generateCertificate = (data) => {
             writeStream.on('finish', async () => {
                 try {
                     const result = await cloudinary.uploader.upload(filePath, {
-                        folder: 'certificates',
-                        public_id: data.certificateId,
-                        resource_type: 'raw' 
-                    });
+                    folder: 'certificates',
+                    public_id: data.certificateId,
+                    resource_type: 'auto', // ⬅️ Change 'raw' to 'auto' or 'image'
+                    flags: "attachment:false" // ⬅️ Ensures it displays instead of downloading
+                });
 
                     if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
                     

@@ -1,6 +1,6 @@
 const Certificate = require('../models/Certificate');
-const Student = require('../models/Student'); // Ensure Student is imported
-const Course = require('../models/Course');   // Ensure Course is imported
+const Student = require('../models/Student'); 
+const Course = require('../models/Course');   
 
 const verifyCertificate = async (req, res) => {
     const { certificateId } = req.params;
@@ -16,11 +16,12 @@ const verifyCertificate = async (req, res) => {
 
         res.json({
             valid: true,
-            // Added safety checks (?.) to prevent 500 errors
             student: certificate.studentId?.name || "N/A",
             course: certificate.courseId?.courseName || "N/A",
             issueDate: certificate.issueDate,
-            certId: certificate.certificateId 
+            certId: certificate.certificateId,
+            // 🟢 CRITICAL FIX: Send the Cloudinary URL to the frontend
+            certificateUrl: certificate.certificateUrl 
         });
     } catch (error) {
         console.error("API Population Error:", error.message);
