@@ -13,7 +13,6 @@ cloudinary.config({
 const generateCertificate = (data) => {
     return new Promise(async (resolve, reject) => {
         try {
-            // 🟢 FIX: Define filePath at the very start
             const fileName = `${data.certificateId}.pdf`;
             const folderPath = path.join(process.cwd(), 'public', 'certificates');
             if (!fs.existsSync(folderPath)) fs.mkdirSync(folderPath, { recursive: true });
@@ -28,69 +27,73 @@ const generateCertificate = (data) => {
             const writeStream = fs.createWriteStream(filePath);
             doc.pipe(writeStream);
 
-            // 🎨 1. BACKGROUND DESIGN (Matching Green & Gold Curves)
-            // Top-Right Dark Green Curve
-            doc.save().moveTo(500, 0)
-               .quadraticCurveTo(700, 30, 841.89, 150)
-               .lineTo(841.89, 0).fill('#1a3d31');
-
-            // Bottom-Left Multi-Layer Green Curve
-            doc.save().moveTo(0, 350)
-               .quadraticCurveTo(150, 450, 350, 595.28)
-               .lineTo(0, 595.28).fill('#1a3d31');
-
-            // Gold Accent Stripe (Matching the image "seal" background style)
-            doc.save().moveTo(0, 420)
-               .quadraticCurveTo(100, 480, 250, 595.28)
-               .lineTo(0, 595.28).fill('#a1824a');
+            // 🎨 1. TRANSLATED SVG BACKGROUND PATHS (From example.html)
+            // Top Right Corner Layers
+            doc.save().moveTo(545, 0).quadraticCurveTo(645, 38, 841.89, 15).lineTo(841.89, 0).fill('#248e43');
+            doc.save().moveTo(575, 0).quadraticCurveTo(640, 34, 841.89, 28).lineTo(841.89, 0).fill('#0e491d');
+            
+            // Bottom Left Corner Layers
+            doc.save().moveTo(0, 295).quadraticCurveTo(176, 532, 286, 595.28).lineTo(0, 595.28).fill('#fff6cf');
+            doc.save().moveTo(0, 337).quadraticCurveTo(161, 536, 274, 595.28).lineTo(0, 595.28).fill('#f8bc00');
+            doc.save().moveTo(0, 370).quadraticCurveTo(160, 548, 265, 595.28).lineTo(0, 595.28).fill('#248e43');
+            doc.save().moveTo(0, 528).quadraticCurveTo(77, 571, 139, 595.28).lineTo(0, 595.28).fill('#0e491d');
 
             const assetsPath = path.join(__dirname, '..', 'assets');
 
-            // 🏛️ 2. TOP HEADER: ISO (Left) & AICTE (Right)
+            // 🏢 2. LOGOS (NXT SYNC, ISO, AICTE)
+            if (fs.existsSync(path.join(assetsPath, 'logo.jpg'))) {
+                doc.image(path.join(assetsPath, 'logo.jpg'), 35, 30, { width: 160 });
+            }
             if (fs.existsSync(path.join(assetsPath, 'ISO1.png'))) {
-                doc.image(path.join(assetsPath, 'ISO1.png'), 40, 40, { width: 90 });
+                doc.image(path.join(assetsPath, 'ISO1.png'), 35, 160, { width: 140 });
             }
             if (fs.existsSync(path.join(assetsPath, 'AICTE.png'))) {
-                doc.image(path.join(assetsPath, 'AICTE.png'), 710, 40, { width: 90 });
+                doc.image(path.join(assetsPath, 'AICTE.png'), 666, 160, { width: 140 });
             }
 
-            // 🏢 3. CENTER LOGO
-            if (fs.existsSync(path.join(assetsPath, 'logo.jpg'))) {
-                doc.image(path.join(assetsPath, 'logo.jpg'), (841.89 / 2) - 80, 30, { width: 160 });
-            }
-
-            // 📝 4. MAIN CONTENT (Pixel Clear Alignment)
-            doc.moveDown(8);
-            doc.font('Helvetica-Bold').fontSize(32).fillColor('#1a3d31').text('INTERNSHIP COMPLETION', { align: 'center' });
-            doc.moveDown(0.2);
-            doc.fontSize(32).text('CERTIFICATE', { align: 'center' });
+            // 📝 3. MAIN TEXT CONTENT
+            doc.moveDown(8.5);
+            doc.font('Times-Bold').fontSize(38).fillColor('#0e491d').text('INTERNSHIP COMPLETION', { align: 'center' });
+            doc.text('CERTIFICATE', { align: 'center' });
             
+            // Green Divider Line
+            doc.strokeColor('#0e491d').lineWidth(3).moveTo(220, 265).lineTo(621, 265).stroke();
+
+            // Student Name (Dynamic)
             doc.moveDown(1.5);
-            doc.font('Helvetica-Bold').fontSize(36).fillColor('#a1824a').text(data.studentName.toUpperCase(), { align: 'center' });
+            doc.font('Times-Italic').fontSize(56).fillColor('#b89c6d').text(data.studentName.toUpperCase(), { align: 'center', underline: true });
             
-            doc.moveDown(1.5);
-            doc.font('Helvetica').fontSize(14).fillColor('#000').text(`has successfully completed the internship Artificial Intelligence conducted by`, { align: 'center' });
-            doc.font('Helvetica-Bold').fontSize(14).text(`Nxtsync from ${data.startDate || '2025-11-24'} to ${data.endDate || '2026-03-31'}.`, { align: 'center' });
+            // Description Body
+            doc.moveDown(1.2);
+            doc.font('Helvetica').fontSize(18).fillColor('#333').text('has successfully completed the internship ', { align: 'center', continued: true });
+            doc.font('Helvetica-Bold').text(data.courseName, { continued: true });
+            doc.font('Helvetica').text(' conducted by');
+            
+            doc.font('Helvetica-Bold').text('Nxtsync', { align: 'center', continued: true });
+            doc.font('Helvetica').text(` from `, { continued: true });
+            doc.font('Helvetica-Bold').text(`${data.startDate}`, { continued: true });
+            doc.font('Helvetica').text(` to `, { continued: true });
+            doc.font('Helvetica-Bold').text(`${data.endDate}.`);
 
-            // 🖋️ 5. FOOTER: CEO SIGN | QR CODE | COO SIGN
-            const footerY = 480;
+            // 🖋️ 4. FOOTER: CEO | QR | COO
+            const footerY = 490;
 
-            // CEO (Left)
+            // CEO Section
             if (fs.existsSync(path.join(assetsPath, 'ceo_sign.png'))) {
-                doc.image(path.join(assetsPath, 'ceo_sign.png'), 250, footerY - 30, { width: 100 });
+                doc.image(path.join(assetsPath, 'ceo_sign.png'), 100, footerY - 40, { width: 120 });
             }
-            doc.font('Helvetica-Bold').fontSize(12).fillColor('#333').text('CEO', 285, footerY + 45);
+            doc.font('Helvetica-Bold').fontSize(16).fillColor('#000').text('CEO', 100, footerY + 35, { width: 120, align: 'center' });
 
-            // QR Code (Center)
+            // Dynamic QR Code
             const verifyUrl = `https://nxtsync.onrender.com/verify.html?id=${data.certificateId}`;
-            const qrDataUrl = await QRCode.toDataURL(verifyUrl);
-            doc.image(qrDataUrl, (841.89 / 2) - 40, footerY - 25, { width: 80 });
+            const qrDataUrl = await QRCode.toDataURL(verifyUrl, { margin: 1 });
+            doc.image(qrDataUrl, (841.89 / 2) - 45, footerY - 25, { width: 90 });
 
-            // COO (Right)
+            // COO Section
             if (fs.existsSync(path.join(assetsPath, 'coo_sign.png'))) {
-                doc.image(path.join(assetsPath, 'coo_sign.png'), 500, footerY - 30, { width: 100 });
+                doc.image(path.join(assetsPath, 'coo_sign.png'), 621, footerY - 40, { width: 120 });
             }
-            doc.font('Helvetica-Bold').fontSize(12).text('COO', 535, footerY + 45);
+            doc.font('Helvetica-Bold').fontSize(16).fillColor('#000').text('COO', 621, footerY + 35, { width: 120, align: 'center' });
 
             doc.end();
 
@@ -113,7 +116,6 @@ const generateCertificate = (data) => {
                     reject(uploadErr);
                 }
             });
-
         } catch (error) {
             reject(error);
         }
