@@ -75,63 +75,61 @@ const approveCertificate = async (req, res) => {
             return res.status(400).json({ message: 'Invalid or already approved request' });
         }
 
+        // 🟢 1. FETCH ENROLLMENT FOR DATES
+        const enrollment = await Enrollment.findOne({ 
+            studentId: request.studentId._id, 
+            courseId: request.courseId._id 
+        });
+
+        const today = new Date();
+        const endDate = today.toLocaleDateString('en-GB'); // Format: DD/MM/YYYY
+        const issueDate = endDate;
+        
+        // Use enrollment creation date as Start Date, fallback to request date if missing
+        const startDate = enrollment 
+            ? new Date(enrollment.createdAt).toLocaleDateString('en-GB') 
+            : new Date(request.createdAt).toLocaleDateString('en-GB');
+
         const certificateId = `CERT-${Date.now()}`;
         const verificationCode = Math.random().toString(36).substring(7).toUpperCase();
 
-        // 1. Generate and Upload to Cloudinary
+        // 🟢 2. GENERATE PDF WITH DYNAMIC DATES
         const cloudinaryUrl = await generateCertificate({
             studentName: request.studentId.name,
             courseName: request.courseId.courseName,
-            duration: request.courseId.duration,
-            date: new Date(),
+            startDate,      
+            endDate,        
+            issueDate,      
             certificateId,
             verificationCode,
         });
 
-        // 2. Save the Cloudinary URL to MongoDB
-// Inside approveCertificate in adminController.js
+        // 🟢 3. SAVE TO DATABASE
         await Certificate.create({
             certificateId,
             studentId: request.studentId._id,
             courseId: request.courseId._id,
-            certificateUrl: String(cloudinaryUrl).replace('http://', 'https://'), // 🟢 Force HTTPS
+            certificateUrl: String(cloudinaryUrl).replace('http://', 'https://'),
             verificationCode,
+            issueDate: today 
         });
 
         request.status = 'approved';
         request.approvedBy = req.user._id;
         await request.save();
 
+        // Mark enrollment as completed
         await Enrollment.findOneAndUpdate(
             { studentId: request.studentId._id, courseId: request.courseId._id },
-            { completed: true, endDate: new Date() }
+            { completed: true, endDate: today }
         );
 
-        // 3. Email Notification
-        let message = 'Certificate approved and link emailed';
-        try {
-            await sendEmail({
-                email: request.studentId.email,
-                subject: 'Your Course Certificate - NXTSYNC',
-                // 🟢 FIX 2: Use HTML for better link formatting
-                html: `<h3>Congratulations ${request.studentId.name}!</h3>
-                       <p>Your certificate for <b>${request.courseId.courseName}</b> is ready.</p>
-                       <p><a href="${cloudinaryUrl}">Click here to view/download your certificate</a></p>`,
-                attachments: [{ 
-                    filename: `${certificateId}.pdf`, // Forces the correct name
-                    path: cloudinaryUrl // Cloudinary URL is valid for Nodemailer paths
-                }]
-            });
-        } catch (emailError) {
-            console.error("Email failed:", emailError.message);
-        }
-        res.json({ message, certificateUrl: cloudinaryUrl });
+        res.json({ message: 'Certificate approved successfully', certificateUrl: cloudinaryUrl });
     } catch (error) {
         console.error('Approve Cert Error:', error);
         res.status(500).json({ message: error.message });
     }
 };
-
 // @desc    Reject certificate request
 const rejectCertificate = async (req, res) => {
     const { requestId, reason } = req.body;
