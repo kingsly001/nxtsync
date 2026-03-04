@@ -87,22 +87,26 @@ const approveCertificate = async (req, res) => {
             ? new Date(enrollment.createdAt).toLocaleDateString('en-GB') 
             : new Date(request.createdAt).toLocaleDateString('en-GB');
 
+        // Inside approveCertificate in adminController.js
         const certificateId = `CERT-${Date.now()}`;
+        const verificationCode = Math.random().toString(36).substring(7).toUpperCase(); // This exists
 
         const cloudinaryUrl = await generateCertificate({
             studentName: request.studentId.name,
             courseName: request.courseId.courseName,
-            startDate,      // 🟢 Pass to Service
-            endDate: formattedToday, // 🟢 Pass to Service
+            startDate,
+            endDate: formattedToday,
             certificateId,
+            verificationCode, // 🟢 Passed to the PDF service
         });
 
-        // Save certificate record
+        // 🟢 FIX: Include verificationCode in the database creation object
         await Certificate.create({
             certificateId,
             studentId: request.studentId._id,
             courseId: request.courseId._id,
             certificateUrl: String(cloudinaryUrl).replace('http://', 'https://'),
+            verificationCode, // 🟢 This line was missing or mismatched in the create call
             issueDate: today 
         });
 
