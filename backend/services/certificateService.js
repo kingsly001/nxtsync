@@ -62,8 +62,10 @@ const generateCertificate = (data) => {
             doc.moveTo(220, currentY).lineTo(620, currentY).lineWidth(2).stroke('#0e491d');
 
             currentY += 35;
-            doc.font('Times-Italic').fontSize(48).fillColor('#b89c6d').text(data.studentName.toUpperCase(), 0, currentY, { align: 'center', underline: true });
-            
+            doc.font('Times-Italic').fontSize(48).fillColor('#b89c6d').text(data.studentName.toUpperCase(), 0, currentY, { align: 'center', underline: false });
+
+            currentY += 40;
+            doc.moveTo(250, currentY).lineTo(590, currentY).lineWidth(1).stroke('#248e43');            
             // 🟢 4. FIXED BODY TEXT (Explicit Y for second line)
 currentY += 85; 
 doc.font('Helvetica').fontSize(16).fillColor('#333');
@@ -81,9 +83,9 @@ doc.font('Helvetica-Bold').text(data.courseName.toUpperCase(), 30, currentY, {
     align: 'center' 
 });
 
-// Line 3: Conducted By + Dates (Centered by starting at X=185)
+// Line 3: Conducted By + Dates (Centered by starting at X=xx)
 currentY += 32; 
-doc.font('Helvetica').text('conducted by ', 200, currentY, { continued: true });
+doc.font('Helvetica').text('conducted by ', 205, currentY, { continued: true });
 doc.font('Helvetica-Bold').text('Nxtsync ', { continued: true });
 doc.font('Helvetica').text('from ', { continued: true });
 doc.font('Helvetica-Bold').text(data.startDate, { continued: true });
