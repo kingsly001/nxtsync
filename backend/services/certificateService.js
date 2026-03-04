@@ -65,36 +65,41 @@ const generateCertificate = (data) => {
             doc.font('Times-Italic').fontSize(48).fillColor('#b89c6d').text(data.studentName.toUpperCase(), 0, currentY, { align: 'center', underline: true });
             
             // 🟢 4. FIXED BODY TEXT (Explicit Y for second line)
-         //  🟢 OPTIMIZED BODY TEXT (Utilizing Left White Space)
-// 🟢 THREE-LINE BODY ALIGNMENT (Starts further left to maximize space)
-        currentY += 85; 
-        doc.font('Helvetica').fontSize(16).fillColor('#333');
+currentY += 85; 
+doc.font('Helvetica').fontSize(16).fillColor('#333');
 
-        // Line 1: Main Introduction
-        doc.text('has successfully completed the internship ', 30, currentY, { 
-            width: 782, 
-            align: 'center' 
-        });
+// Line 1: Introduction
+doc.text('has successfully completed the internship', 30, currentY, { 
+    width: 782, 
+    align: 'center' 
+});
 
-        // Line 2: Bold Course Name (Forced to its own line to prevent overlap)
-        currentY += 28; 
-        doc.font('Helvetica-Bold').text(data.courseName.toUpperCase(), 30, currentY, { 
-            width: 782, 
-            align: 'center' 
-        });
+// Line 2: Bold Course Name (Dedicated line to prevent overlap)
+currentY += 28; 
+doc.font('Helvetica-Bold').text(data.courseName.toUpperCase(), 30, currentY, { 
+    width: 782, 
+    align: 'center' 
+});
 
-        // Line 3: Nxtsync and Dynamic Dates
-        currentY += 32; 
-        doc.font('Helvetica').text('conducted by ', 30, currentY, { 
-            width: 782, 
-            align: 'center', 
-            continued: true 
-        });
-        doc.font('Helvetica-Bold').text('Nxtsync', { continued: true });
-        doc.font('Helvetica').text(' from ', { continued: true });
-        doc.font('Helvetica-Bold').text(data.startDate, { continued: true });
-        doc.font('Helvetica').text(' to ', { continued: true });
-        doc.font('Helvetica-Bold').text(data.endDate + '.');
+// Line 3: Conducted By
+currentY += 28; 
+doc.font('Helvetica').text('conducted by ', 30, currentY, { 
+    width: 782, 
+    align: 'center',
+    continued: true 
+});
+doc.font('Helvetica-Bold').text('Nxtsync');
+
+// Line 4: Dynamic Dates (Final line for maximum breathing room)
+currentY += 28; 
+doc.font('Helvetica').text('from ', 30, currentY, { 
+    width: 782, 
+    align: 'center', 
+    continued: true 
+});
+doc.font('Helvetica-Bold').text(data.startDate, { continued: true });
+doc.font('Helvetica').text(' to ', { continued: true });
+doc.font('Helvetica-Bold').text(data.endDate + '.');
 
             // 🖋️ 5. FOOTER
             const footerY = 485;
