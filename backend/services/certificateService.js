@@ -83,7 +83,7 @@ doc.font('Helvetica-Bold').text(data.courseName.toUpperCase(), 30, currentY, {
 
 // Line 3: Conducted By + Nxtsync + Dates (Shifted Left to X=150)
 currentY += 32; 
-doc.font('Helvetica').text('conducted by ', 150, currentY, { continued: true });
+doc.font('Helvetica').text('conducted by ', 175, currentY, { continued: true });
 doc.font('Helvetica-Bold').text('Nxtsync ', { continued: true });
 doc.font('Helvetica').text('from ', { continued: true });
 doc.font('Helvetica-Bold').text(data.startDate, { continued: true });
