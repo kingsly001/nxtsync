@@ -64,6 +64,8 @@ const getCertificateRequests = async (req, res) => {
 
 // ... (imports remain the same)
 
+// Inside approveCertificate in adminController.js
+// Inside approveCertificate in adminController.js
 const approveCertificate = async (req, res) => {
     const { requestId } = req.body;
     try {
@@ -71,62 +73,44 @@ const approveCertificate = async (req, res) => {
             .populate('studentId')
             .populate('courseId');
 
-        if (!request || request.status === 'approved') {
-            return res.status(400).json({ message: 'Invalid or already approved request' });
-        }
-
-        // 🟢 1. FETCH ENROLLMENT FOR DATES
+        // Fetch Enrollment to get the original start date
         const enrollment = await Enrollment.findOne({ 
             studentId: request.studentId._id, 
             courseId: request.courseId._id 
         });
 
         const today = new Date();
-        const endDate = today.toLocaleDateString('en-GB'); // Format: DD/MM/YYYY
-        const issueDate = endDate;
+        const formattedToday = today.toLocaleDateString('en-GB'); // DD/MM/YYYY
         
-        // Use enrollment creation date as Start Date, fallback to request date if missing
+        // Dynamic Date Logic
         const startDate = enrollment 
             ? new Date(enrollment.createdAt).toLocaleDateString('en-GB') 
             : new Date(request.createdAt).toLocaleDateString('en-GB');
 
         const certificateId = `CERT-${Date.now()}`;
-        const verificationCode = Math.random().toString(36).substring(7).toUpperCase();
 
-        // 🟢 2. GENERATE PDF WITH DYNAMIC DATES
         const cloudinaryUrl = await generateCertificate({
             studentName: request.studentId.name,
             courseName: request.courseId.courseName,
-            startDate,      
-            endDate,        
-            issueDate,      
+            startDate,      // 🟢 Pass to Service
+            endDate: formattedToday, // 🟢 Pass to Service
             certificateId,
-            verificationCode,
         });
 
-        // 🟢 3. SAVE TO DATABASE
+        // Save certificate record
         await Certificate.create({
             certificateId,
             studentId: request.studentId._id,
             courseId: request.courseId._id,
             certificateUrl: String(cloudinaryUrl).replace('http://', 'https://'),
-            verificationCode,
             issueDate: today 
         });
 
         request.status = 'approved';
-        request.approvedBy = req.user._id;
         await request.save();
 
-        // Mark enrollment as completed
-        await Enrollment.findOneAndUpdate(
-            { studentId: request.studentId._id, courseId: request.courseId._id },
-            { completed: true, endDate: today }
-        );
-
-        res.json({ message: 'Certificate approved successfully', certificateUrl: cloudinaryUrl });
+        res.json({ message: 'Certificate generated successfully', url: cloudinaryUrl });
     } catch (error) {
-        console.error('Approve Cert Error:', error);
         res.status(500).json({ message: error.message });
     }
 };
