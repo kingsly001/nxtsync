@@ -65,17 +65,26 @@ const generateCertificate = (data) => {
             doc.font('Times-Italic').fontSize(48).fillColor('#b89c6d').text(data.studentName.toUpperCase(), 0, currentY, { align: 'center', underline: true });
             
             // 🟢 4. FIXED BODY TEXT (Explicit Y for second line)
-            currentY += 85;
+         //  🟢 OPTIMIZED BODY TEXT (Utilizing Left White Space)
+            currentY += 85; 
             doc.font('Helvetica').fontSize(16).fillColor('#333');
-            
-            // First Part
-            doc.text('has successfully completed the internship ', 150, currentY, { width: 541, align: 'center', continued: true });
+
+            // First Line: Expanded width to 741, moved X to 50
+            doc.text('has successfully completed the internship ', 50, currentY, { 
+                width: 741, 
+                align: 'center', 
+                continued: true 
+            });
             doc.font('Helvetica-Bold').text(data.courseName, { continued: true });
             doc.font('Helvetica').text(' conducted by');
 
-            // Force jump to next line to prevent overlap
-            currentY += 28; 
-            doc.font('Helvetica-Bold').text('Nxtsync', 150, currentY, { width: 541, align: 'center', continued: true });
+            // Second Line: Realigned to match new horizontal bounds
+            currentY += 38; // Slightly more gap for larger text blocks
+            doc.font('Helvetica-Bold').text('Nxtsync', 50, currentY, { 
+                width: 741, 
+                align: 'center', 
+                continued: true 
+            });
             doc.font('Helvetica').text(' from ', { continued: true });
             doc.font('Helvetica-Bold').text(data.startDate, { continued: true });
             doc.font('Helvetica').text(' to ', { continued: true });
