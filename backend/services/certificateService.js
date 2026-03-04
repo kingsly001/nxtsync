@@ -65,6 +65,7 @@ const generateCertificate = (data) => {
             doc.font('Times-Italic').fontSize(48).fillColor('#b89c6d').text(data.studentName.toUpperCase(), 0, currentY, { align: 'center', underline: true });
             
             // 🟢 4. FIXED BODY TEXT (Explicit Y for second line)
+// 🟢 REFINED FOUR-LINE BODY (Pixel-Perfect Alignment)
 currentY += 85; 
 doc.font('Helvetica').fontSize(16).fillColor('#333');
 
@@ -74,29 +75,21 @@ doc.text('has successfully completed the internship', 30, currentY, {
     align: 'center' 
 });
 
-// Line 2: Bold Course Name (Dedicated line to prevent overlap)
+// Line 2: Bold Course Name
 currentY += 28; 
 doc.font('Helvetica-Bold').text(data.courseName.toUpperCase(), 30, currentY, { 
     width: 782, 
     align: 'center' 
 });
 
-// Line 3: Conducted By
-currentY += 28; 
-doc.font('Helvetica').text('conducted by ', 30, currentY, { 
-    width: 782, 
-    align: 'center',
-    continued: true 
-});
+// Line 3: Conducted By & Nxtsync (Shifted Left to avoid overlap)
+currentY += 30; 
+doc.font('Helvetica').text('conducted by ', 230, currentY, { continued: true });
 doc.font('Helvetica-Bold').text('Nxtsync');
 
-// Line 4: Dynamic Dates (Final line for maximum breathing room)
-currentY += 28; 
-doc.font('Helvetica').text('from ', 30, currentY, { 
-    width: 782, 
-    align: 'center', 
-    continued: true 
-});
+// Line 4: Centered Dynamic Dates (Manual X-offset for centering)
+currentY += 30; 
+doc.font('Helvetica').text('from ', 200, currentY, { continued: true });
 doc.font('Helvetica-Bold').text(data.startDate, { continued: true });
 doc.font('Helvetica').text(' to ', { continued: true });
 doc.font('Helvetica-Bold').text(data.endDate + '.');
