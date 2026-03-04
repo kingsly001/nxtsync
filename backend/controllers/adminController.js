@@ -88,8 +88,9 @@ const approveCertificate = async (req, res) => {
             : new Date(request.createdAt).toLocaleDateString('en-GB');
 
         // Inside approveCertificate in adminController.js
+        // Inside approveCertificate in adminController.js
         const certificateId = `CERT-${Date.now()}`;
-        const verificationCode = Math.random().toString(36).substring(7).toUpperCase(); // This exists
+        const verificationCode = Math.random().toString(36).substring(7).toUpperCase();
 
         const cloudinaryUrl = await generateCertificate({
             studentName: request.studentId.name,
@@ -97,16 +98,15 @@ const approveCertificate = async (req, res) => {
             startDate,
             endDate: formattedToday,
             certificateId,
-            verificationCode, // 🟢 Passed to the PDF service
+            verificationCode, // Pass to PDF
         });
 
-        // 🟢 FIX: Include verificationCode in the database creation object
         await Certificate.create({
             certificateId,
             studentId: request.studentId._id,
             courseId: request.courseId._id,
             certificateUrl: String(cloudinaryUrl).replace('http://', 'https://'),
-            verificationCode, // 🟢 This line was missing or mismatched in the create call
+            verificationCode, // 🟢 Required for MongoDB
             issueDate: today 
         });
 
