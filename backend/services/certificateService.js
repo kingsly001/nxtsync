@@ -66,29 +66,35 @@ const generateCertificate = (data) => {
             
             // 🟢 4. FIXED BODY TEXT (Explicit Y for second line)
          //  🟢 OPTIMIZED BODY TEXT (Utilizing Left White Space)
-            currentY += 85; 
-            doc.font('Helvetica').fontSize(16).fillColor('#333');
+// 🟢 THREE-LINE BODY ALIGNMENT (Starts further left to maximize space)
+        currentY += 85; 
+        doc.font('Helvetica').fontSize(16).fillColor('#333');
 
-            // First Line: Expanded width to 741, moved X to 50
-            doc.text('has successfully completed the internship ', 50, currentY, { 
-                width: 741, 
-                align: 'center', 
-                continued: true 
-            });
-            doc.font('Helvetica-Bold').text(data.courseName, { continued: true });
-            doc.font('Helvetica').text(' conducted by');
+        // Line 1: Main Introduction
+        doc.text('has successfully completed the internship ', 30, currentY, { 
+            width: 782, 
+            align: 'center' 
+        });
 
-            // Second Line: Realigned to match new horizontal bounds
-            currentY += 38; // Slightly more gap for larger text blocks
-            doc.font('Helvetica-Bold').text('Nxtsync', 50, currentY, { 
-                width: 741, 
-                align: 'center', 
-                continued: true 
-            });
-            doc.font('Helvetica').text(' from ', { continued: true });
-            doc.font('Helvetica-Bold').text(data.startDate, { continued: true });
-            doc.font('Helvetica').text(' to ', { continued: true });
-            doc.font('Helvetica-Bold').text(data.endDate + '.');
+        // Line 2: Bold Course Name (Forced to its own line to prevent overlap)
+        currentY += 28; 
+        doc.font('Helvetica-Bold').text(data.courseName.toUpperCase(), 30, currentY, { 
+            width: 782, 
+            align: 'center' 
+        });
+
+        // Line 3: Nxtsync and Dynamic Dates
+        currentY += 32; 
+        doc.font('Helvetica').text('conducted by ', 30, currentY, { 
+            width: 782, 
+            align: 'center', 
+            continued: true 
+        });
+        doc.font('Helvetica-Bold').text('Nxtsync', { continued: true });
+        doc.font('Helvetica').text(' from ', { continued: true });
+        doc.font('Helvetica-Bold').text(data.startDate, { continued: true });
+        doc.font('Helvetica').text(' to ', { continued: true });
+        doc.font('Helvetica-Bold').text(data.endDate + '.');
 
             // 🖋️ 5. FOOTER
             const footerY = 485;
