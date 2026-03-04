@@ -53,7 +53,7 @@ const generateCertificate = (data) => {
             if (fs.existsSync(path.join(assetsPath, 'AICTE.png'))) doc.image(path.join(assetsPath, 'AICTE.png'), 670, 140, { width: 130 });
 
             // 📝 3. TEXT SECTION (Manual Y-tracking to prevent collapse)
-            let currentY = 125;
+            let currentY = 150;
             doc.fillColor('#0e491d').font('Times-Bold').fontSize(32).text('INTERNSHIP COMPLETION', 0, currentY, { align: 'center' });
             currentY += 38;
             doc.text('CERTIFICATE', 0, currentY, { align: 'center' });
@@ -64,10 +64,10 @@ const generateCertificate = (data) => {
             currentY += 35;
             doc.font('Times-Italic').fontSize(48).fillColor('#b89c6d').text(data.studentName.toUpperCase(), 0, currentY, { align: 'center', underline: false });
 
-            currentY += 40;
+            currentY += 60;
             doc.moveTo(250, currentY).lineTo(590, currentY).lineWidth(1).stroke('#248e43');            
             // 🟢 4. FIXED BODY TEXT (Explicit Y for second line)
-currentY += 85; 
+currentY += 45; 
 doc.font('Helvetica').fontSize(16).fillColor('#333');
 
 // Line 1: Introduction
