@@ -1,93 +1,80 @@
-this # NXT SYNC - Certificate Management System
+# 🎓 NXT SYNC: Automated Certificate Management System
 
-NXT SYNC is a modern, automated platform designed to streamline course enrollments, track student progress, and generate professional, verifiable certificates. It provides dedicated portals for both Students and Administrators, ensuring a seamless academic management experience.
+**NXT SYNC** is a professional, full-stack platform designed to streamline course enrollments and generate secure, verifiable internship certificates using a custom-built PDF engine.
+
+---
 
 ## 🚀 Features
 
-*   **Automated Enrollment**: Students can enroll in courses and receive instant credentials via email.
-*   **Dynamic Dashboard**: Real-time statistics for both students (progress, certificates) and admins (enrollments, requests).
-*   **Certificate Engine**: Auto-generates high-quality PDF certificates with:
-    *   Unique Verification ID.
-    *   Scannable QR Code for instant verification.
-    *   ISO & AICTE Certification Badges.
-*   **Approval Workflow**: Admins can review, approve, or reject certificate requests with a single click.
-*   **Security**: Role-based authentication (Admin/Student) and secure data handling.
+* **Automated Workflow**: Admin dashboard for reviewing, approving, or rejecting certificate requests.
+* **Custom PDF Engine**: High-fidelity generation using `PDFKit` with 12-layer SVG vector designs.
+* **QR Verification**: Each certificate includes a unique ID and a scannable QR code linking to a live verification portal.
+* **Cloud Infrastructure**: Automated uploads to **Cloudinary** for permanent, secure storage.
+* **Secure Authentication**: Role-based access control (RBAC) powered by **JWT**.
+
+---
 
 ## 🛠️ Technology Stack
 
-*   **Frontend**: HTML5, CSS3 (Modern UI), Vanilla JavaScript.
-*   **Backend**: Node.js, Express.js.
-*   **Database**: MongoDB (Mongoose ODM).
-*   **Key Libraries**:
-    *   `pdfkit` & `qrcode`: For server-side certificate generation.
-    *   `nodemailer`: For automated email notifications.
-    *   `jsonwebtoken`: For secure authentication.
-
-## 📦 Installation & Setup
-
-Follow these steps to set up the project locally.
-
-### 1. Prerequisites
-Ensure you have the following installed:
-*   [Node.js](https://nodejs.org/) (v14+)
-*   [MongoDB](https://www.mongodb.com/try/download/community) (Running locally or Atlas URI)
-
-### 2. Backend Setup
-The backend handles the API, database connection, and certificate generation.
-
-1.  Navigate to the backend directory:
-    ```bash
-    cd backend
-    ```
-2.  Install dependencies:
-    ```bash
-    npm install
-    ```
-3.  Configure Environment Variables:
-    Create a `.env` file in the `backend` folder with the following:
-    ```env
-    PORT=5000
-    MONGO_URI=mongodb://localhost:27017/nxtsync
-    JWT_SECRET=your_jwt_secret_key_here
-    EMAIL_USER=your_email@gmail.com
-    EMAIL_PASS=your_app_password
-    ```
-    *(Note: For email features to work, use a valid Gmail App Password)*
-
-4.  Seed the Database (Create Admin & Courses):
-    ```bash
-    npm run seed
-    ```
-    *This will create the default Admin account and populate initial courses.*
-
-5.  Start the Server:
-    ```bash
-    npm run dev
-    ```
-    *Server will start on `http://localhost:5000`*
-
-### 3. Frontend Setup
-The frontend is built with static files and can be served easily.
-
-1.  Navigate to the `frontend` directory.
-2.  Open `index.html` in your browser.
-    *   *Recommended*: Use VS Code's **Live Server** extension for the best experience.
-
-## 🔑 Default Credentials
-
-Use these credentials to access the Admin Dashboard after seeding the database.
-
-| Role | Username / Email | Password |
-| :--- | :--- | :--- |
-| **Admin** | `admin@nxtsync.com` | `password123` |
-
-## 🛡️ Usage Workflow
-
-1.  **Enrollment**: A new student visits `enroll.html`, fills the form, and selects a course. They receive a **Student ID** and **Password** (simulated on screen + email).
-2.  **Student Login**: Student logs in, tracks progress, and requests a certificate upon completion.
-3.  **Admin Verification**: Admin logs in, sees the "Pending Request", and clicks **Approve**.
-4.  **Certificate Delivery**: The system generates the PDF with a QR code and emails it to the student.
-5.  **Verification**: Anyone can scan the QR code to verify the certificate's authenticity.
+| Layer | Technology |
+| :--- | :--- |
+| **Frontend** | HTML5, CSS3, Vanilla JavaScript, EJS |
+| **Backend** | Node.js, Express.js |
+| **Database** | MongoDB (Mongoose ODM) |
+| **Hosting** | Cloudinary API (Media), Render/Railway (Server) |
 
 ---
-*Developed by NXT SYNC Team*
+
+## 📦 Installation & Configuration
+
+### 1. Environment Setup
+To protect sensitive credentials, this project uses a `.env` file for configuration. **Do not commit your actual `.env` file to version control.**
+
+1. Navigate to the `/backend` directory.
+2. Create a file named `.env`.
+3. Copy and paste the following template and fill in your specific values:
+
+```env
+# Server Configuration
+PORT=5000
+JWT_SECRET=your_custom_secret_key
+
+# Database
+MONGO_URI=your_mongodb_connection_string
+
+# Cloudinary Credentials (Required for Certificate Hosting)
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
+
+2. Setting Up Cloudinary (For Organizations)
+If you are setting this up for a new organization, obtain your API keys as follows:
+
+Create an account at Cloudinary.com.
+
+Navigate to your Dashboard.
+
+Copy the Cloud Name, API Key, and API Secret into the .env file above.
+
+🎨 Asset Requirements
+The certificate engine requires specific brand assets in the backend/assets/ directory to run correctly:
+
+logo.jpg (Company Branding)
+
+ISO1.png & AICTE.png (Accreditation Badges)
+
+ceo_sign.png & coo_sign.png (Executive Signatures)
+
+🌐 Production Deployment
+When deploying to a live host (e.g., Render or AWS):
+
+Environment Variables: Add your .env keys directly into your hosting provider's configuration dashboard.
+
+Verification URL: In backend/services/certificateService.js, update the verifyUrl to match your live domain.
+
+Example: https://your-domain.com/verify.html?id=
+
+🔑 Default Admin Credentials
+Username: admin@nxtsync.com
+
+Password: password123
